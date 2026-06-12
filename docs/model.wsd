@@ -1,0 +1,62 @@
+@startuml
+title Dishd — Diagrama de Classes do Domínio
+
+class Usuario {
+    id: int
+    user: String
+    nome: String
+    email: String
+    telefone: String
+    password: String
+}
+
+class Avaliacao {
+    id: int
+    nota: float
+    comentario: String
+    fotoURL: String
+    favorito: boolean
+}
+
+class ReacaoAvaliacao {
+    id: int
+    tipo: Reacao
+}
+
+enum Reacao {
+    LIKE
+    DISLIKE
+}
+
+class Restaurante {
+    id: int
+    nome: String
+    endereco: String
+    notaMedia: float
+    qntdAvaliacoes: int
+    fotoURL: String
+}
+
+class Categoria {
+    id: int
+    nome: String
+}
+
+class CategoriaRestaurante {
+    categoriaId: int
+    restauranteId: int
+}
+
+
+' --- Relacionamentos ---
+Usuario "1" --> "0..*" Avaliacao : faz
+Restaurante "1" <-- "0..*" Avaliacao : avalia
+Restaurante "1" -- "0..*" CategoriaRestaurante : tem
+CategoriaRestaurante "0..*" -- "1" Categoria : referencia
+Avaliacao "1" <-- "0..*" ReacaoAvaliacao : recebe
+Usuario "1" --> "0..*" ReacaoAvaliacao : faz
+
+ReacaoAvaliacao -- Reacao
+
+
+@enduml

@@ -1,0 +1,17 @@
+﻿Nome: Dishd
+
+Equipe: Eduardo Ferraz, Mateus Biancardi e Ricardo Modenese
+
+Descrição: O Dishd é uma plataforma social mobile-first dedicada à curadoria e registro de experiências gastronômicas na Grande Vitória. Inspirado no modelo de journaling do Letterboxd, o sistema permite que entusiastas da culinária local transformem o ato de comer fora em um diário pessoal e social, organizando visitas, notas e recomendações em uma interface elegante e intuitiva.
+
+Usuários pretendidos: O público-alvo compreende entusiastas da gastronomia capixaba, desde quem procura novos sabores até usuários que desejam catalogar, avaliar e compartilhar suas experiências culinárias de forma organizada e social.
+
+Principais funcionalidades: O sistema oferece um diário interativo onde usuários registram visitas com notas e fotos, criar listas temáticas de roteiros locais, acompanhar um feed social de amigos e visualizar estatísticas detalhadas de seus hábitos de consumo, tudo integrado de forma otimizada para a exploração rápida.
+
+Especificações técnicas das tecnologias utilizadas: 
+Frontend: Web (Mobile)
+Tecnologias: React, Typescript, Tailwind, PWA, Java, PostgreSQL.
+Formato de arquivos: .java, .tsx, .ts, .css, .html.
+Framework: NextJS, Spring Boot. 
+
+Link Design: https://www.figma.com/design/AoAV5LVgo9GXlB0vNEJrzh/Dishd---PI?node-id=0-1&t=tp4iwzmvE7AZQ4Sz-1
