@@ -1,0 +1,38 @@
+# Sobe o backend (Spring Boot) + PostgreSQL juntos.
+# Uso: docker compose up --build
+# API:    http://localhost:8080
+# Swagger http://localhost:8080/swagger-ui.html
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: dishd
+      POSTGRES_USER: dishd
+      POSTGRES_PASSWORD: dishd
+    ports:
+      - "5432:5432"
+    volumes:
+      - dishd_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dishd"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: dishd
+      DB_USER: dishd
+      DB_PASSWORD: dishd
+    ports:
+      - "8080:8080"
+
+volumes:
+  dishd_pgdata:

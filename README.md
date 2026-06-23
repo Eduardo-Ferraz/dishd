@@ -147,18 +147,18 @@ classDiagram
 
 ## 📂 Estrutura do repositório
 
-> ℹ️ O projeto está em fase inicial. A estrutura abaixo é o **alvo planejado** do monorepo —
-> as pastas `backend/` e `frontend/` serão criadas conforme a implementação avança.
+> ℹ️ O **backend já está implementado** (API REST completa). O `frontend/` em Next.js
+> é o próximo passo planejado.
 
 ```text
 dishd/
-├── backend/            # API REST em Spring Boot (Java + Maven)
-├── frontend/           # App web em Next.js (TypeScript + Tailwind)
+├── backend/            # ✅ API REST em Spring Boot (Java 17 + Maven) — ver backend/README.md
+├── frontend/           # ⏳ App web em Next.js (TypeScript + Tailwind) — a implementar
 ├── docs/               # Documentação do projeto
 │   ├── model.wsd       # Diagrama de classes (PlantUML)
 │   ├── image.png       # Mockups de tela (Figma)
 │   └── [Projeto Integrado] Proposta de Projeto.txt
-├── docker-compose.yml  # Sobe app + PostgreSQL para desenvolvimento
+├── docker-compose.yml  # Sobe backend + PostgreSQL com um comando
 ├── LICENSE
 └── README.md
 ```
@@ -172,38 +172,31 @@ dishd/
 - [Node.js 18+](https://nodejs.org/) e npm
 - [PostgreSQL 15+](https://www.postgresql.org/) — ou [Docker](https://www.docker.com/)
 
-### Opção 1 — Docker Compose (mais simples)
+### Opção 1 — Backend com banco em memória (mais rápida)
 
-Sobe o backend, o frontend e o banco PostgreSQL de uma vez:
+Não precisa instalar banco nenhum, só o Java. Sobe a API já com dados de exemplo:
+
+```bash
+cd backend
+./mvnw spring-boot:run        # Windows: mvnw.cmd spring-boot:run
+```
+
+- API: <http://localhost:8080>
+- Documentação interativa (Swagger): <http://localhost:8080/swagger-ui.html>
+- Usuário de teste: `demo@dishd.com` / `demo1234`
+
+### Opção 2 — Docker Compose (backend + PostgreSQL)
 
 ```bash
 docker compose up --build
 ```
 
-- Frontend: <http://localhost:3000>
-- API: <http://localhost:8080>
+A API sobe em <http://localhost:8080> conectada a um PostgreSQL.
 
-### Opção 2 — Executar manualmente
-
-**Backend (Spring Boot):**
-
-```bash
-cd backend
-./mvnw spring-boot:run
-# API disponível em http://localhost:8080
-```
-
-**Frontend (Next.js):**
-
-```bash
-cd frontend
-npm install
-npm run dev
-# App disponível em http://localhost:3000
-```
-
-> Configure as variáveis de conexão com o banco em `backend/src/main/resources/application.properties`
-> (ou via variáveis de ambiente) antes de iniciar o backend.
+> Detalhes do backend — endpoints, perfis e autenticação JWT — em [`backend/README.md`](backend/README.md).
+>
+> O **frontend** (Next.js) ainda será implementado; quando existir, rodará em
+> <http://localhost:3000> com `npm install && npm run dev`.
 
 ## 📚 Como gerar a documentação do código
 
