@@ -1,9 +1,13 @@
+import Navbar from "./components/navbar";
+// import Tabs from "./components/Tabs";
+// import RestaurantGrid from "./components/RestaurantGrid";
+// import BottomNav from "./components/BottomNav";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-primary/50 text-white">
-      <h1 className="text-4xl font-bold bg-red-500 p-4 rounded-lg">
-        Teste do Tailwind
-      </h1>
+    <main>
+      <Navbar></Navbar>
+      teste
     </main>
   );
 }
