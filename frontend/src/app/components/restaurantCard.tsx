@@ -1,11 +1,13 @@
 import Image from 'next/image';
+import StarRating from './starRating';
 
 interface RestaurantCardProps {
     name: string;
     image: string;
+    rating: number;
 }
 
-export default function RestaurantCard({name, image}: RestaurantCardProps) {
+export default function RestaurantCard({name, image, rating}: RestaurantCardProps) {
     return (
         <div className="flex flex-col items-center gap-1 cursor-pointer">
             <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-secundary hover:scale-105 transition-transform duration-300">
@@ -16,6 +18,7 @@ export default function RestaurantCard({name, image}: RestaurantCardProps) {
                 />
             </div>
             <span className="text-xs text-gray-700 font-medium">{name}</span>
+            <StarRating rating={rating} />
         </div>
     );
 }
