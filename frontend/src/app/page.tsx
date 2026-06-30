@@ -1,6 +1,6 @@
 import Navbar from "./components/navbar";
 import Tabs from "./components/abas";
-// import RestaurantGrid from "./components/RestaurantGrid";
+import RestaurantGrid from "./components/restaurantGrid";
 // import BottomNav from "./components/BottomNav";
 
 export default function Home() {
@@ -8,6 +8,7 @@ export default function Home() {
     <main>
       <Navbar></Navbar>
       <Tabs></Tabs>
+      <RestaurantGrid></RestaurantGrid>
     </main>
   );
 }
