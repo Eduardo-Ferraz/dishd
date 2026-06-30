@@ -6,4 +6,9 @@
   --color-cards: #FFFFFF;
   --color-primary-text: #717171;
   --color-secundary: #E2E2E2;
+
+  --font-display: var(--font-playfair), serif;
+  --font-playfair: var(--font-playfair), serif;
+  --font-jakarta: var(--font-plus-jakarta), sans-serif;
+  --font-work: var(--font-work-sans), sans-serif;
 }
