@@ -1,7 +1,7 @@
 import Navbar from "./components/navbar";
 import Tabs from "./components/abas";
 import RestaurantGrid from "./components/restaurantGrid";
-// import BottomNav from "./components/BottomNav";
+import BottomNav from "./components/bottomNav";
 
 export default function Home() {
   return (
@@ -9,6 +9,7 @@ export default function Home() {
       <Navbar></Navbar>
       <Tabs></Tabs>
       <RestaurantGrid></RestaurantGrid>
+      <BottomNav></BottomNav>
     </main>
   );
 }
