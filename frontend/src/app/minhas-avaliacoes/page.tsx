@@ -1,3 +1,6 @@
+
 export default function MinhasAvaliacoes() {
-  return <div>Página de avaliações</div>;
+  return (
+    <span>Teste</span>
+  );
 }
