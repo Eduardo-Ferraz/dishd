@@ -11,12 +11,18 @@ export default function Tabs() {
     const [active, setActive] = useState(0);
     const pathname = usePathname();
 
-    if (pathname !== "/") {
+    if (pathname === "/minhas-avaliacoes") {
         return (
-        <nav className="border-b border-secundary bg-background px-4 py-3">
-            <span className="text-base font-semibold text-gray-800">Avaliações</span>
+        <nav className="flex bg-cards border-b border-secundary">
+            <button className="flex-1 py-1 text-sm font-work font-medium font-xs transition-colors text-primary border-b-2 border-primary">
+                Minhas Avaliações
+            </button>
         </nav>
         );
+    }
+
+    if (pathname !== "/") {
+        return null;
     }
 
     return (
