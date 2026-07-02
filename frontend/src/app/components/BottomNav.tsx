@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const navItems = [
     { href: "/minhas-avaliacoes", icon: "/soup-kitchen.svg", label: "Minhas avaliações" },
-    { href: "/", icon: "/ion_restaurant.svg", label: "Restaurantes" },
+    { href: "/home", icon: "/ion_restaurant.svg", label: "Restaurantes" },
     { href: "/busca", icon: "/search-bold.svg", label: "Buscar" },
 ]
 

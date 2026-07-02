@@ -21,7 +21,7 @@ export default function Tabs() {
         );
     }
 
-    if (pathname !== "/") {
+    if (pathname !== "/home") {
         return null;
     }
 
