@@ -1,4 +1,4 @@
-import StarRating from "./starRating";
+import StarRating from "./StarRating";
 
 interface RestaurantInfoProps {
     name: string;

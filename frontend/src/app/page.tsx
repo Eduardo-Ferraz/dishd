@@ -1,7 +1,7 @@
-import Navbar from "./components/navbar";
-import Tabs from "./components/abas";
-import RestaurantGrid from "./components/restaurantGrid";
-import BottomNav from "./components/bottomNav";
+import Navbar from "./components/Navbar";
+import Tabs from "./components/Abas";
+import RestaurantGrid from "./components/RestaurantGrid";
+import BottomNav from "./components/BottomNav";
 
 export default function Home() {
   return (

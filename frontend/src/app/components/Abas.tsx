@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useState } from "react"
-import RestaurantGrid from "./restaurantGrid";
+import RestaurantGrid from "./RestaurantGrid";
 import AvaliacoesTab from "./AvaliacoesTab";
 import ListaTab from "./ListaTab";
 
