@@ -1,4 +1,4 @@
-import RestaurantCard from "./restaurantCard";
+import RestaurantCard from "./RestaurantCard";
 import { restaurants } from "../data/restaurant";
 
 export default function RestaurantGrid() {
