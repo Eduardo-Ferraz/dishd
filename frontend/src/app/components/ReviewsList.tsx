@@ -1,5 +1,5 @@
 "use client"
-import StarRating from "./starRating";
+import StarRating from "./StarRating";
 import { Review } from "../data/restaurant";
 import Image from 'next/image';
 import { useState } from "react";

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import StarRating from "./starRating";
+import StarRating from "./StarRating";
 import { Videos } from "next/dist/lib/metadata/types/metadata-types";
 
 interface ReviewModalProps {

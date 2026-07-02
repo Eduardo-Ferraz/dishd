@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import StarRating from './starRating';
+import StarRating from './StarRating';
 import Link from 'next/link';
 
 interface RestaurantCardProps {

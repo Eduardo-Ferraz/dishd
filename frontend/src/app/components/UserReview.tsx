@@ -1,5 +1,5 @@
 "use client";
-import StarRating from "./starRating";
+import StarRating from "./StarRating";
 import ReviewModal from "./ReviewModal";
 import { useState } from "react";
  

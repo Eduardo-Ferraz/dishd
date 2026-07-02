@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { getRestaurantById } from "../../data/restaurant";
-import DetailHeader from "../../components/detailHeader";
-import RestaurantInfo from "../../components/restaurantInfo";
-import UserReview from "../../components/userReview";
-import Categories from "../../components/categories";
-import ReviewsList from "../../components/reviewsList";
+import DetailHeader from "../../components/DetailHeader";
+import RestaurantInfo from "../../components/RestaurantInfo";
+import UserReview from "../../components/UserReview";
+import Categories from "../../components/Categories";
+import ReviewsList from "../../components/ReviewsList";
 
 interface PageProps {
   params: Promise<{ id: string }>;
