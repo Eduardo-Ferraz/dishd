@@ -8,9 +8,6 @@ export default function Home() {
     <main className="min-h-screen fex flex-col max-w-md mx-auto relative">
       <Navbar />
       <Tabs />
-      <div className="flex-1 overflow-y-auto pb-20">
-        <RestaurantGrid />
-      </div>
       <BottomNav />
     </main>
   );
