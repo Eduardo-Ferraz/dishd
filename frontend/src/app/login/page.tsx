@@ -1,50 +1,47 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
+import { login, type AuthState } from "../actions/auth";
 import Logo from "../components/Logo";
 import SocialLogin from "../components/SocialLogin";
 
 export default function LoginPage() {
-    const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [senha, setSenha] = useState("");
-
-    function handleLogin() {
-        // Aqui vai a chamada à API futuramente
-        router.push("/home");
-    }
+    const [state, action, pending] = useActionState<AuthState, FormData>(login, {});
 
     return (
         <main className="min-h-screen flex flex-col">
             <div className="flex-1 flex flex-col justify-end items-center px-8 pb-10 bg-white">
                 <div className="w-full max-w-sm flex flex-col items-center gap-8">
                 <Logo />
-        
-                <div className="w-full flex flex-col gap-3">
+
+                <form action={action} className="w-full flex flex-col gap-3">
                     <input
                     type="email"
+                    name="email"
                     placeholder="E-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    required
                     className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                     <input
                     type="password"
+                    name="password"
                     placeholder="Senha"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
+                    required
                     className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
                     />
+                    {state.error && (
+                    <p className="text-xs text-red-600">{state.error}</p>
+                    )}
                     <button
-                    onClick={handleLogin}
-                    className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors mt-1"
+                    type="submit"
+                    disabled={pending}
+                    className="w-full py-3 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors mt-1 disabled:opacity-60"
                     >
-                    Entrar
+                    {pending ? "Entrando..." : "Entrar"}
                     </button>
-                </div>
+                </form>
                 </div>
             </div>
-        
+
             <div className="bg-background px-8 pt-6 pb-10 flex flex-col items-center">
                 <SocialLogin />
             </div>

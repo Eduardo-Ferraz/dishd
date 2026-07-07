@@ -1,23 +1,11 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
+import { register, type AuthState } from "../actions/auth";
 import Logo from "../components/Logo";
 import SocialLogin from "../components/SocialLogin";
 
 export default function CadastroPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [confirma, setConfirma] = useState("");
-  const [celular, setCelular] = useState("");
-  const [termos, setTermos] = useState(false);
-
-  const canSubmit = email && senha && confirma && celular && termos && senha === confirma;
-
-  function handleCadastro() {
-    // Aqui vai a chamada à API futuramente
-    router.push("/home");
-  }
+  const [state, action, pending] = useActionState<AuthState, FormData>(register, {});
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -25,58 +13,68 @@ export default function CadastroPage() {
         <div className="w-full max-w-sm flex flex-col items-center gap-8">
           <Logo />
 
-          <div className="w-full flex flex-col gap-3">
+          <form action={action} className="w-full flex flex-col gap-3">
+            <input
+              type="text"
+              name="nome"
+              placeholder="Nome completo"
+              required
+              className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            <input
+              type="text"
+              name="username"
+              placeholder="Nome de usuário (@)"
+              required
+              minLength={3}
+              maxLength={50}
+              className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
+            />
             <input
               type="email"
+              name="email"
               placeholder="E-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              required
               className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <input
               type="password"
+              name="password"
               placeholder="Senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
+              required
+              minLength={6}
               className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <input
               type="password"
+              name="confirma"
               placeholder="Senha novamente"
-              value={confirma}
-              onChange={(e) => setConfirma(e.target.value)}
+              required
+              minLength={6}
               className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <input
               type="tel"
-              placeholder="Celular"
-              value={celular}
-              onChange={(e) => setCelular(e.target.value)}
+              name="telefone"
+              placeholder="Celular (opcional)"
               className="w-full px-4 py-3 border border-primary rounded-xl text-sm text-gray-700 placeholder-primary-text focus:outline-none focus:ring-1 focus:ring-primary"
             />
 
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={termos}
-                onChange={(e) => setTermos(e.target.checked)}
-                className="w-4 h-4 accent-primary"
-              />
+              <input type="checkbox" name="termos" required className="w-4 h-4 accent-primary" />
               <span className="text-xs text-primary-text">Li e concordo com os termos e serviços</span>
             </label>
 
+            {state.error && <p className="text-xs text-red-600">{state.error}</p>}
+
             <button
-              onClick={handleCadastro}
-              disabled={!canSubmit}
-              className={`w-full py-3 rounded-xl font-semibold text-sm transition-colors mt-1 ${
-                canSubmit
-                  ? "bg-primary text-white hover:bg-primary/90"
-                  : "bg-secundary text-primary-text cursor-not-allowed"
-              }`}
+              type="submit"
+              disabled={pending}
+              className="w-full py-3 rounded-xl font-semibold text-sm transition-colors mt-1 bg-primary text-white hover:bg-primary/90 disabled:opacity-60"
             >
-              Cadastrar
+              {pending ? "Cadastrando..." : "Cadastrar"}
             </button>
-          </div>
+          </form>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { logout } from "../actions/auth";
 
 export default function Navbar(){
     return (
@@ -8,9 +9,20 @@ export default function Navbar(){
                 <Image src="/dishd-icon.svg" alt="logo" width={36} height={36} />
             </Link>
             <span className="text-xl font-bold text-gray-800 tracking-wide">Dishd</span>
-            <Link className="w-10 h-10" href="/minhas-avaliacoes">
-                <Image src="/person-box.svg" alt="perfil" width={36} height={36} />
-            </Link>
+            <div className="flex items-center gap-2">
+                <Link className="w-10 h-10 flex items-center justify-center" href="/minhas-avaliacoes">
+                    <Image src="/person-box.svg" alt="perfil" width={36} height={36} />
+                </Link>
+                <form action={logout}>
+                    <button
+                        type="submit"
+                        title="Sair"
+                        className="text-xs text-primary-text hover:text-primary transition-colors"
+                    >
+                        Sair
+                    </button>
+                </form>
+            </div>
         </header>
     )
 }
