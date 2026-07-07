@@ -64,10 +64,19 @@ class ApiIntegrationTest {
     }
 
     @Test
-    void listarRestaurantes_publico_retornaSeed() throws Exception {
+    void listarRestaurantes_publico_retornaSeedPaginado() throws Exception {
         mvc.perform(get("/api/restaurantes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nome").isNotEmpty());
+                .andExpect(jsonPath("$.content[0].nome").isNotEmpty())
+                .andExpect(jsonPath("$.totalElements").isNumber());
+    }
+
+    @Test
+    void listarRestaurantes_respeitaTamanhoDePagina() throws Exception {
+        mvc.perform(get("/api/restaurantes").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(2))
+                .andExpect(jsonPath("$.content.length()").value(2));
     }
 
     @Test

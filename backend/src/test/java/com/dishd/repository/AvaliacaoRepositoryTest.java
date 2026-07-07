@@ -3,15 +3,19 @@ package com.dishd.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.dishd.domain.Avaliacao;
+import com.dishd.domain.Reacao;
+import com.dishd.domain.ReacaoAvaliacao;
 import com.dishd.domain.Restaurante;
 import com.dishd.domain.Usuario;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.PageRequest;
 
-/** Testa as agregacoes @Query de {@link AvaliacaoRepository} contra o H2. */
+/** Testa as agregacoes/batch @Query dos repositorios de avaliacao e reacao contra o H2. */
 @DataJpaTest
 class AvaliacaoRepositoryTest {
 
@@ -19,9 +23,13 @@ class AvaliacaoRepositoryTest {
     TestEntityManager em;
     @Autowired
     AvaliacaoRepository repository;
+    @Autowired
+    ReacaoAvaliacaoRepository reacaoRepository;
 
     Usuario usuario;
     Restaurante restaurante;
+    Avaliacao a1;
+    Avaliacao a2;
 
     @BeforeEach
     void seed() {
@@ -36,8 +44,10 @@ class AvaliacaoRepositoryTest {
         restaurante.setNome("Restaurante");
         em.persist(restaurante);
 
-        em.persist(avaliacao(4.0, true));
-        em.persist(avaliacao(2.0, false));
+        a1 = avaliacao(4.0, true);
+        a2 = avaliacao(2.0, false);
+        em.persist(a1);
+        em.persist(a2);
         em.flush();
     }
 
@@ -71,8 +81,53 @@ class AvaliacaoRepositoryTest {
     }
 
     @Test
-    void feedOrdenadoPorMaisRecente() {
-        var avaliacoes = repository.findByUsuario_IdOrderByCriadoEmDesc(usuario.getId());
-        assertThat(avaliacoes).hasSize(2);
+    void diarioDoUsuario_paginado() {
+        var pagina = repository.findByUsuario_IdOrderByCriadoEmDesc(usuario.getId(), PageRequest.of(0, 10));
+        assertThat(pagina.getTotalElements()).isEqualTo(2);
+        assertThat(pagina.getContent()).hasSize(2);
+    }
+
+    @Test
+    void contagemDeReacoesEmLote_agrupaPorAvaliacaoETipo() {
+        // a1: 1 like ; a2: 1 dislike (usuario reage nas proprias, so para exercitar a query).
+        reagir(a1, Reacao.LIKE);
+        reagir(a2, Reacao.DISLIKE);
+        em.flush();
+
+        List<ReacaoContagem> contagens =
+                reacaoRepository.contarReacoesPorAvaliacaoIds(List.of(a1.getId(), a2.getId()));
+
+        assertThat(contagens).hasSize(2);
+        assertThat(contagens).anySatisfy(c -> {
+            assertThat(c.getAvaliacaoId()).isEqualTo(a1.getId());
+            assertThat(c.getTipo()).isEqualTo(Reacao.LIKE);
+            assertThat(c.getTotal()).isEqualTo(1);
+        });
+        assertThat(contagens).anySatisfy(c -> {
+            assertThat(c.getAvaliacaoId()).isEqualTo(a2.getId());
+            assertThat(c.getTipo()).isEqualTo(Reacao.DISLIKE);
+            assertThat(c.getTotal()).isEqualTo(1);
+        });
+    }
+
+    @Test
+    void reacoesDoUsuarioEmLote_retornaSomenteDoConjunto() {
+        reagir(a1, Reacao.LIKE);
+        em.flush();
+
+        List<ReacaoAvaliacao> minhas = reacaoRepository
+                .findByUsuario_IdAndAvaliacao_IdIn(usuario.getId(), List.of(a1.getId(), a2.getId()));
+
+        assertThat(minhas).hasSize(1);
+        assertThat(minhas.get(0).getAvaliacao().getId()).isEqualTo(a1.getId());
+        assertThat(minhas.get(0).getTipo()).isEqualTo(Reacao.LIKE);
+    }
+
+    private void reagir(Avaliacao a, Reacao tipo) {
+        ReacaoAvaliacao r = new ReacaoAvaliacao();
+        r.setUsuario(usuario);
+        r.setAvaliacao(a);
+        r.setTipo(tipo);
+        em.persist(r);
     }
 }

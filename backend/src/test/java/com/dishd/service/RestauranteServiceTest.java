@@ -3,6 +3,7 @@ package com.dishd.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,6 +22,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /** Testes de CRUD e filtros de restaurantes ({@link RestauranteService}). */
 @ExtendWith(MockitoExtension.class)
@@ -46,37 +51,39 @@ class RestauranteServiceTest {
         return c;
     }
 
+    private final Pageable pageable = PageRequest.of(0, 20);
+
     @Test
     void listar_comBusca_usaFiltroPorNome() {
-        when(restauranteRepository.findByNomeContainingIgnoreCaseOrderByNomeAsc("pizza"))
-                .thenReturn(List.of(restaurante("Pizza da Praia")));
+        when(restauranteRepository.findByNomeContainingIgnoreCaseOrderByNomeAsc(eq("pizza"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(restaurante("Pizza da Praia"))));
 
-        List<RestauranteDTO> res = service.listar("pizza", null);
+        Page<RestauranteDTO> res = service.listar("pizza", null, pageable);
 
-        assertThat(res).hasSize(1);
-        verify(restauranteRepository).findByNomeContainingIgnoreCaseOrderByNomeAsc("pizza");
+        assertThat(res.getContent()).hasSize(1);
+        verify(restauranteRepository).findByNomeContainingIgnoreCaseOrderByNomeAsc(eq("pizza"), any(Pageable.class));
     }
 
     @Test
     void listar_comCategoria_usaFiltroPorCategoria() {
-        when(restauranteRepository.findByCategorias_IdOrderByNomeAsc(3L))
-                .thenReturn(List.of(restaurante("Sushi Praia")));
+        when(restauranteRepository.findByCategorias_IdOrderByNomeAsc(eq(3L), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(restaurante("Sushi Praia"))));
 
-        List<RestauranteDTO> res = service.listar(null, 3L);
+        Page<RestauranteDTO> res = service.listar(null, 3L, pageable);
 
-        assertThat(res).hasSize(1);
-        verify(restauranteRepository).findByCategorias_IdOrderByNomeAsc(3L);
+        assertThat(res.getContent()).hasSize(1);
+        verify(restauranteRepository).findByCategorias_IdOrderByNomeAsc(eq(3L), any(Pageable.class));
     }
 
     @Test
     void listar_semFiltro_listaTudo() {
-        when(restauranteRepository.findAllByOrderByNomeAsc())
-                .thenReturn(List.of(restaurante("A"), restaurante("B")));
+        when(restauranteRepository.findAllByOrderByNomeAsc(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(restaurante("A"), restaurante("B"))));
 
-        List<RestauranteDTO> res = service.listar(null, null);
+        Page<RestauranteDTO> res = service.listar(null, null, pageable);
 
-        assertThat(res).hasSize(2);
-        verify(restauranteRepository).findAllByOrderByNomeAsc();
+        assertThat(res.getContent()).hasSize(2);
+        verify(restauranteRepository).findAllByOrderByNomeAsc(any(Pageable.class));
     }
 
     @Test

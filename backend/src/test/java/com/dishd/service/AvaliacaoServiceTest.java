@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -24,6 +25,7 @@ import com.dishd.repository.AvaliacaoRepository;
 import com.dishd.repository.ReacaoAvaliacaoRepository;
 import com.dishd.repository.RestauranteRepository;
 import com.dishd.security.CurrentUserService;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /** Testes das regras de avaliacoes, ownership e reacoes ({@link AvaliacaoService}). */
 @ExtendWith(MockitoExtension.class)
@@ -196,5 +202,34 @@ class AvaliacaoServiceTest {
 
         assertThatThrownBy(() -> service.buscar(404L))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void feed_usaContagemEmLote_semNPlus1() {
+        Avaliacao a = avaliacaoDe(autor);
+        Page<Avaliacao> page = new PageImpl<>(List.of(a), PageRequest.of(0, 20), 1);
+        when(avaliacaoRepository.findAllByOrderByCriadoEmDesc(any(Pageable.class))).thenReturn(page);
+        when(reacaoRepository.contarReacoesPorAvaliacaoIds(any())).thenReturn(List.of());
+        when(reacaoRepository.findByUsuario_IdAndAvaliacao_IdIn(eq(1L), any())).thenReturn(List.of());
+
+        Page<AvaliacaoDTO> res = service.feed(PageRequest.of(0, 20));
+
+        assertThat(res.getContent()).hasSize(1);
+        assertThat(res.getContent().get(0).likes()).isEqualTo(0);
+        assertThat(res.getContent().get(0).dislikes()).isEqualTo(0);
+        // Batch: NAO cai no caminho de contagem individual (1 query por avaliacao).
+        verify(reacaoRepository, never()).countByAvaliacao_IdAndTipo(any(), any());
+    }
+
+    @Test
+    void porUsuario_paginaVazia_retornaSemConsultarReacoes() {
+        Page<Avaliacao> vazia = new PageImpl<>(List.of(), PageRequest.of(0, 20), 0);
+        when(avaliacaoRepository.findByUsuario_IdOrderByCriadoEmDesc(eq(1L), any(Pageable.class)))
+                .thenReturn(vazia);
+
+        Page<AvaliacaoDTO> res = service.porUsuario(1L, PageRequest.of(0, 20));
+
+        assertThat(res.getContent()).isEmpty();
+        verify(reacaoRepository, never()).contarReacoesPorAvaliacaoIds(any());
     }
 }

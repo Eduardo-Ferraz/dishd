@@ -12,10 +12,14 @@ import com.dishd.exception.ForbiddenException;
 import com.dishd.exception.ResourceNotFoundException;
 import com.dishd.repository.AvaliacaoRepository;
 import com.dishd.repository.ReacaoAvaliacaoRepository;
+import com.dishd.repository.ReacaoContagem;
 import com.dishd.repository.RestauranteRepository;
 import com.dishd.security.CurrentUserService;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,8 +49,7 @@ public class AvaliacaoService {
     @Transactional(readOnly = true)
     public Page<AvaliacaoDTO> feed(Pageable pageable) {
         Long currentUserId = currentUserService.getCurrentUsuarioIdOrNull();
-        return avaliacaoRepository.findAllByOrderByCriadoEmDesc(pageable)
-                .map(a -> toDTO(a, currentUserId));
+        return paginarComDTO(avaliacaoRepository.findAllByOrderByCriadoEmDesc(pageable), currentUserId);
     }
 
     @Transactional(readOnly = true)
@@ -56,17 +59,23 @@ public class AvaliacaoService {
     }
 
     @Transactional(readOnly = true)
-    public List<AvaliacaoDTO> porUsuario(Long usuarioId) {
+    public Page<AvaliacaoDTO> porUsuario(Long usuarioId, Pageable pageable) {
         Long currentUserId = currentUserService.getCurrentUsuarioIdOrNull();
-        return avaliacaoRepository.findByUsuario_IdOrderByCriadoEmDesc(usuarioId).stream()
-                .map(a -> toDTO(a, currentUserId)).toList();
+        return paginarComDTO(
+                avaliacaoRepository.findByUsuario_IdOrderByCriadoEmDesc(usuarioId, pageable), currentUserId);
     }
 
     @Transactional(readOnly = true)
-    public List<AvaliacaoDTO> porRestaurante(Long restauranteId) {
+    public Page<AvaliacaoDTO> porRestaurante(Long restauranteId, Pageable pageable) {
         Long currentUserId = currentUserService.getCurrentUsuarioIdOrNull();
-        return avaliacaoRepository.findByRestaurante_IdOrderByCriadoEmDesc(restauranteId).stream()
-                .map(a -> toDTO(a, currentUserId)).toList();
+        return paginarComDTO(
+                avaliacaoRepository.findByRestaurante_IdOrderByCriadoEmDesc(restauranteId, pageable), currentUserId);
+    }
+
+    /** Converte uma pagina de entidades em DTOs usando contagens de reacao em lote (sem N+1). */
+    private Page<AvaliacaoDTO> paginarComDTO(Page<Avaliacao> page, Long currentUserId) {
+        List<AvaliacaoDTO> dtos = toDTOs(page.getContent(), currentUserId);
+        return new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
     }
 
     // ---------------- Escrita ----------------
@@ -176,6 +185,7 @@ public class AvaliacaoService {
         restauranteRepository.save(restaurante);
     }
 
+    /** DTO de uma unica avaliacao (contagens consultadas individualmente). */
     private AvaliacaoDTO toDTO(Avaliacao a, Long currentUserId) {
         long likes = reacaoRepository.countByAvaliacao_IdAndTipo(a.getId(), Reacao.LIKE);
         long dislikes = reacaoRepository.countByAvaliacao_IdAndTipo(a.getId(), Reacao.DISLIKE);
@@ -184,6 +194,42 @@ public class AvaliacaoService {
             minhaReacao = reacaoRepository.findByUsuario_IdAndAvaliacao_Id(currentUserId, a.getId())
                     .map(ReacaoAvaliacao::getTipo).orElse(null);
         }
+        return montarDTO(a, likes, dislikes, minhaReacao);
+    }
+
+    /** DTOs de varias avaliacoes com contagens/reacoes carregadas em lote (evita N+1). */
+    private List<AvaliacaoDTO> toDTOs(List<Avaliacao> avaliacoes, Long currentUserId) {
+        if (avaliacoes.isEmpty()) {
+            return List.of();
+        }
+        List<Long> ids = avaliacoes.stream().map(Avaliacao::getId).toList();
+
+        Map<Long, Long> likes = new HashMap<>();
+        Map<Long, Long> dislikes = new HashMap<>();
+        for (ReacaoContagem c : reacaoRepository.contarReacoesPorAvaliacaoIds(ids)) {
+            if (c.getTipo() == Reacao.LIKE) {
+                likes.put(c.getAvaliacaoId(), c.getTotal());
+            } else if (c.getTipo() == Reacao.DISLIKE) {
+                dislikes.put(c.getAvaliacaoId(), c.getTotal());
+            }
+        }
+
+        Map<Long, Reacao> minhasReacoes = new HashMap<>();
+        if (currentUserId != null) {
+            for (ReacaoAvaliacao r : reacaoRepository.findByUsuario_IdAndAvaliacao_IdIn(currentUserId, ids)) {
+                minhasReacoes.put(r.getAvaliacao().getId(), r.getTipo());
+            }
+        }
+
+        return avaliacoes.stream()
+                .map(a -> montarDTO(a,
+                        likes.getOrDefault(a.getId(), 0L),
+                        dislikes.getOrDefault(a.getId(), 0L),
+                        minhasReacoes.get(a.getId())))
+                .toList();
+    }
+
+    private AvaliacaoDTO montarDTO(Avaliacao a, long likes, long dislikes, Reacao minhaReacao) {
         Usuario u = a.getUsuario();
         Restaurante r = a.getRestaurante();
         return new AvaliacaoDTO(

@@ -8,7 +8,6 @@ import com.dishd.service.AvaliacaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,8 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Avaliacoes")
 public class AvaliacaoController {
 
-    private static final int MAX_SIZE = 100;
-
     private final AvaliacaoService avaliacaoService;
 
     public AvaliacaoController(AvaliacaoService avaliacaoService) {
@@ -39,9 +36,7 @@ public class AvaliacaoController {
     @Operation(summary = "Feed social: avaliacoes mais recentes, paginadas")
     public PagedResponse<AvaliacaoDTO> feed(@RequestParam(defaultValue = "0") int page,
                                             @RequestParam(defaultValue = "20") int size) {
-        int safeSize = Math.min(Math.max(size, 1), MAX_SIZE);
-        int safePage = Math.max(page, 0);
-        return PagedResponse.from(avaliacaoService.feed(PageRequest.of(safePage, safeSize)));
+        return PagedResponse.from(avaliacaoService.feed(PagedResponse.pageable(page, size)));
     }
 
     @GetMapping("/{id}")

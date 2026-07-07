@@ -14,11 +14,11 @@ public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
     /** Feed social: avaliacoes mais recentes primeiro. */
     Page<Avaliacao> findAllByOrderByCriadoEmDesc(Pageable pageable);
 
-    /** Diario de um usuario. */
-    List<Avaliacao> findByUsuario_IdOrderByCriadoEmDesc(Long usuarioId);
+    /** Diario de um usuario (paginado). */
+    Page<Avaliacao> findByUsuario_IdOrderByCriadoEmDesc(Long usuarioId, Pageable pageable);
 
-    /** Avaliacoes de um restaurante. */
-    List<Avaliacao> findByRestaurante_IdOrderByCriadoEmDesc(Long restauranteId);
+    /** Avaliacoes de um restaurante (paginado). */
+    Page<Avaliacao> findByRestaurante_IdOrderByCriadoEmDesc(Long restauranteId, Pageable pageable);
 
     // ---- agregacoes para o restaurante ----
 

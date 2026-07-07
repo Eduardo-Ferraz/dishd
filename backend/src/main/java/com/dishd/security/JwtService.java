@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +17,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtService.class);
+
     private final SecretKey key;
     private final long expirationMs;
 
     public JwtService(@Value("${dishd.jwt.secret}") String secret,
                       @Value("${dishd.jwt.expiration-ms}") long expirationMs) {
+        if (secret.startsWith("troque-esta-chave")) {
+            log.warn("JWT usando o secret PADRAO de desenvolvimento. "
+                    + "Defina a variavel de ambiente DISHD_JWT_SECRET em producao.");
+        }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
     }

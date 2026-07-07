@@ -1,6 +1,7 @@
 package com.dishd.controller;
 
 import com.dishd.dto.AvaliacaoDTO;
+import com.dishd.dto.PagedResponse;
 import com.dishd.dto.RestauranteDTO;
 import com.dishd.dto.RestauranteRequest;
 import com.dishd.service.AvaliacaoService;
@@ -8,7 +9,6 @@ import com.dishd.service.RestauranteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,10 +36,12 @@ public class RestauranteController {
     }
 
     @GetMapping
-    @Operation(summary = "Lista restaurantes (filtros opcionais: busca por nome, categoriaId)")
-    public List<RestauranteDTO> listar(@RequestParam(required = false) String busca,
-                                       @RequestParam(required = false) Long categoriaId) {
-        return restauranteService.listar(busca, categoriaId);
+    @Operation(summary = "Lista restaurantes paginados (filtros opcionais: busca por nome, categoriaId)")
+    public PagedResponse<RestauranteDTO> listar(@RequestParam(required = false) String busca,
+                                                @RequestParam(required = false) Long categoriaId,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "20") int size) {
+        return PagedResponse.from(restauranteService.listar(busca, categoriaId, PagedResponse.pageable(page, size)));
     }
 
     @GetMapping("/{id}")
@@ -49,9 +51,11 @@ public class RestauranteController {
     }
 
     @GetMapping("/{id}/avaliacoes")
-    @Operation(summary = "Lista as avaliacoes de um restaurante")
-    public List<AvaliacaoDTO> avaliacoes(@PathVariable Long id) {
-        return avaliacaoService.porRestaurante(id);
+    @Operation(summary = "Lista as avaliacoes de um restaurante (paginado)")
+    public PagedResponse<AvaliacaoDTO> avaliacoes(@PathVariable Long id,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "20") int size) {
+        return PagedResponse.from(avaliacaoService.porRestaurante(id, PagedResponse.pageable(page, size)));
     }
 
     @PostMapping

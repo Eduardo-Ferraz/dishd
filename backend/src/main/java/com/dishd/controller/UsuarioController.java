@@ -2,6 +2,7 @@ package com.dishd.controller;
 
 import com.dishd.dto.AvaliacaoDTO;
 import com.dishd.dto.EstatisticasDTO;
+import com.dishd.dto.PagedResponse;
 import com.dishd.dto.UsuarioDTO;
 import com.dishd.service.AvaliacaoService;
 import com.dishd.service.EstatisticaService;
@@ -12,6 +13,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** Perfis de usuarios, seus diarios (avaliacoes) e estatisticas. */
@@ -44,9 +46,11 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}/avaliacoes")
-    @Operation(summary = "Diario do usuario: suas avaliacoes, mais recentes primeiro")
-    public List<AvaliacaoDTO> avaliacoes(@PathVariable Long id) {
-        return avaliacaoService.porUsuario(id);
+    @Operation(summary = "Diario do usuario: suas avaliacoes, mais recentes primeiro (paginado)")
+    public PagedResponse<AvaliacaoDTO> avaliacoes(@PathVariable Long id,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "20") int size) {
+        return PagedResponse.from(avaliacaoService.porUsuario(id, PagedResponse.pageable(page, size)));
     }
 
     @GetMapping("/{id}/estatisticas")

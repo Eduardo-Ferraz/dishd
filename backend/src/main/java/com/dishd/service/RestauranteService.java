@@ -9,6 +9,8 @@ import com.dishd.repository.CategoriaRepository;
 import com.dishd.repository.RestauranteRepository;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,16 +28,16 @@ public class RestauranteService {
     }
 
     @Transactional(readOnly = true)
-    public List<RestauranteDTO> listar(String busca, Long categoriaId) {
-        List<Restaurante> restaurantes;
+    public Page<RestauranteDTO> listar(String busca, Long categoriaId, Pageable pageable) {
+        Page<Restaurante> restaurantes;
         if (busca != null && !busca.isBlank()) {
-            restaurantes = restauranteRepository.findByNomeContainingIgnoreCaseOrderByNomeAsc(busca.trim());
+            restaurantes = restauranteRepository.findByNomeContainingIgnoreCaseOrderByNomeAsc(busca.trim(), pageable);
         } else if (categoriaId != null) {
-            restaurantes = restauranteRepository.findByCategorias_IdOrderByNomeAsc(categoriaId);
+            restaurantes = restauranteRepository.findByCategorias_IdOrderByNomeAsc(categoriaId, pageable);
         } else {
-            restaurantes = restauranteRepository.findAllByOrderByNomeAsc();
+            restaurantes = restauranteRepository.findAllByOrderByNomeAsc(pageable);
         }
-        return restaurantes.stream().map(RestauranteDTO::from).toList();
+        return restaurantes.map(RestauranteDTO::from);
     }
 
     @Transactional(readOnly = true)
