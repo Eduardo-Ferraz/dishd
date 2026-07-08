@@ -1,27 +1,28 @@
 "use client";
 import { useState } from "react";
-import StarRating from "./StarRating";
-import { Videos } from "next/dist/lib/metadata/types/metadata-types";
 
 interface ReviewModalProps {
     onClose: () => void;
     onSubmit: (review: {rating: number; comment: string; favorite: boolean}) => void;
+    initialComment?: string;
+    initialRating?: number;
+    initialFavorite?: boolean;
+    submitting?: boolean;
 }
 
 const MAX_CHARS = 250;
 
-export default function ReviewModal({ onClose, onSubmit}: ReviewModalProps) {
-    const [comment, setComment] = useState("");
-    const [rating, setRating] = useState(0);
+export default function ReviewModal({ onClose, onSubmit, initialComment = "", initialRating = 0, initialFavorite = false, submitting = false }: ReviewModalProps) {
+    const [comment, setComment] = useState(initialComment);
+    const [rating, setRating] = useState(initialRating);
     const [hovered, setHovered] = useState(0);
-    const [favorite, setFavorite] = useState(false);
-    
-    const canSubmit = comment.length > 0 && rating > 0;
+    const [favorite, setFavorite] = useState(initialFavorite);
+
+    const canSubmit = comment.length > 0 && rating > 0 && !submitting;
 
     function handleSubmit() {
         if(!canSubmit) return;
         onSubmit({ rating, comment, favorite });
-        onClose();
     }
 
     return (
@@ -105,7 +106,7 @@ export default function ReviewModal({ onClose, onSubmit}: ReviewModalProps) {
                         : "bg-secundary text-primary-text cursor-not-allowed"
                     }`}
                     >
-                    Publicar avaliação
+                    {submitting ? "Publicando..." : "Publicar avaliação"}
                 </button>
             </div>
         </div>

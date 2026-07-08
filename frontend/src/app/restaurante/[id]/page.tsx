@@ -45,8 +45,12 @@ export default async function RestaurantDetailPage({ params }: PageProps) {
         totalReviews={restaurante.qntdAvaliacoes}
       />
       <UserReview
-        initialRating={minha?.nota}
-        initialComment={minha?.comentario ?? undefined}
+        restauranteId={restaurante.id}
+        avaliacao={
+          minha
+            ? { id: minha.id, nota: minha.nota, comentario: minha.comentario, favorito: minha.favorito }
+            : undefined
+        }
       />
       <Categories categories={restaurante.categorias.map((c) => c.nome)} />
       <ReviewsList avaliacoes={outras} />
