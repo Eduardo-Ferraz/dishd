@@ -3,7 +3,7 @@ import StarRating from './StarRating';
 import Link from 'next/link';
 
 interface RestaurantCardProps {
-    id: string;
+    id: number | string;
     name: string;
     image: string;
     rating: number;

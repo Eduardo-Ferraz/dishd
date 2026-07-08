@@ -1,13 +1,20 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { useState } from "react"
+import { useState } from "react";
 import RestaurantGrid from "./RestaurantGrid";
 import AvaliacoesTab from "./AvaliacoesTab";
 import ListaTab from "./ListaTab";
+import type { AvaliacaoDTO, ListaTop5, RestauranteDTO } from "../lib/types";
 
 const tabs = ["Restaurantes", "Avaliações", "Lista"];
 
-export default function Tabs() {
+interface TabsProps {
+    restaurantes?: RestauranteDTO[];
+    avaliacoes?: AvaliacaoDTO[];
+    listas?: ListaTop5[];
+}
+
+export default function Tabs({ restaurantes = [], avaliacoes = [], listas = [] }: TabsProps) {
     const [active, setActive] = useState(0);
     const pathname = usePathname();
 
@@ -42,9 +49,9 @@ export default function Tabs() {
                     </button>
                 ))}
             </nav>
-            {active === 0 && <RestaurantGrid />}
-            {active === 1 && <AvaliacoesTab />}
-            {active === 2 && <ListaTab />}
+            {active === 0 && <RestaurantGrid restaurantes={restaurantes} />}
+            {active === 1 && <AvaliacoesTab avaliacoes={avaliacoes} />}
+            {active === 2 && <ListaTab listas={listas} />}
         </>
     )
 }

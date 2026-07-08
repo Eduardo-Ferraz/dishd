@@ -2,14 +2,13 @@ import StarRating from "./StarRating";
 
 interface RestaurantInfoProps {
     name: string;
-    neighborhood: string;
-    city: string;
+    endereco: string | null;
     rating: number;
     totalReviews: number;
 }
 
 export default function RestaurantInfo({
-    name, neighborhood, city, rating, totalReviews,
+    name, endereco, rating, totalReviews,
 }: RestaurantInfoProps) {
     return (
        <div className="px-4 pt-2">
@@ -20,9 +19,7 @@ export default function RestaurantInfo({
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
                 </svg>
-                <span>
-                {neighborhood}, {city}
-                </span>
+                <span>{endereco ?? "Endereço não informado"}</span>
             </div>
         
             <div className="flex items-center gap-3 mt-4 bg-cards rounded-xl px-4 py-3 shadow-sm w-fit">

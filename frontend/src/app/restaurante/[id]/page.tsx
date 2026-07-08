@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
-import { getRestaurantById } from "../../data/restaurant";
+import { api, ApiError } from "../../lib/api";
+import { getCurrentUser } from "../../lib/session";
+import { fallbackImg } from "../../lib/images";
+import type { AvaliacaoDTO, PagedResponse, RestauranteDTO } from "../../lib/types";
 import DetailHeader from "../../components/DetailHeader";
 import RestaurantInfo from "../../components/RestaurantInfo";
 import UserReview from "../../components/UserReview";
@@ -12,28 +15,41 @@ interface PageProps {
 
 export default async function RestaurantDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const restaurant = getRestaurantById(id);
 
-  if (!restaurant) {
-    notFound();
+  let restaurante: RestauranteDTO;
+  try {
+    restaurante = await api<RestauranteDTO>(`/api/restaurantes/${id}`);
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) {
+      notFound();
+    }
+    throw e;
   }
+
+  const [avaliacoesResp, user] = await Promise.all([
+    api<PagedResponse<AvaliacaoDTO>>(`/api/restaurantes/${id}/avaliacoes?size=50`),
+    getCurrentUser(),
+  ]);
+
+  const avaliacoes = avaliacoesResp.content;
+  const minha = user ? avaliacoes.find((a) => a.usuarioId === user.id) : undefined;
+  const outras = minha ? avaliacoes.filter((a) => a.id !== minha.id) : avaliacoes;
 
   return (
     <main className="min-h-screen bg-background max-w-md mx-auto">
-      <DetailHeader image={restaurant.image} name={restaurant.name} />
+      <DetailHeader image={fallbackImg(restaurante.fotoUrl, restaurante.id)} name={restaurante.nome} />
       <RestaurantInfo
-        name={restaurant.name}
-        neighborhood={restaurant.neighborhood}
-        city={restaurant.city}
-        rating={restaurant.rating}
-        totalReviews={restaurant.totalReviews}
+        name={restaurante.nome}
+        endereco={restaurante.endereco}
+        rating={restaurante.notaMedia}
+        totalReviews={restaurante.qntdAvaliacoes}
       />
       <UserReview
-        initialRating={restaurant.userReview?.rating}
-        initialComment={restaurant.userReview?.comment}
+        initialRating={minha?.nota}
+        initialComment={minha?.comentario ?? undefined}
       />
-      <Categories categories={restaurant.categories} />
-      <ReviewsList reviews={restaurant.reviews} />
+      <Categories categories={restaurante.categorias.map((c) => c.nome)} />
+      <ReviewsList avaliacoes={outras} />
     </main>
   );
 }

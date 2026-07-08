@@ -53,6 +53,13 @@ export interface EstatisticasDTO {
   categoriaFavorita: string | null;
 }
 
+/** Top 5 restaurantes de uma categoria, derivado client/server-side (nao existe entidade Lista). */
+export interface ListaTop5 {
+  categoria: string;
+  fotoUrl: string | null;
+  restaurantes: { id: number; nome: string; notaMedia: number }[];
+}
+
 export interface PagedResponse<T> {
   content: T[];
   page: number;

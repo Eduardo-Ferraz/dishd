@@ -1,17 +1,21 @@
 "use client"
 import StarRating from "./StarRating";
-import { Review } from "../data/restaurant";
 import Image from 'next/image';
 import { useState } from "react";
- 
-interface ReviewsListProps {
-  reviews: Review[];
-}
- 
-export default function ReviewsList({ reviews }: ReviewsListProps) {
-  const [votes, setVotes] = useState<Record<string, "like" | "dislike" | null>>({});
+import { fallbackImg } from "../lib/images";
+import type { AvaliacaoDTO, Reacao } from "../lib/types";
 
-  function handleVote(id: string, type: "like" | "dislike") {
+interface ReviewsListProps {
+  avaliacoes: AvaliacaoDTO[];
+}
+
+export default function ReviewsList({ avaliacoes }: ReviewsListProps) {
+  // Reacao local (visual). F3 liga em Server Action + revalidatePath.
+  const [votes, setVotes] = useState<Record<number, Reacao | null>>(
+    () => Object.fromEntries(avaliacoes.map((a) => [a.id, a.minhaReacao]))
+  );
+
+  function handleVote(id: number, type: Reacao) {
     setVotes((prev) => ({
       ...prev,
       [id]: prev[id] === type ? null : type, // clicou de novo = desfaz
@@ -26,35 +30,39 @@ export default function ReviewsList({ reviews }: ReviewsListProps) {
         </svg>
         Avaliações
       </div>
- 
+
+      {avaliacoes.length === 0 && (
+        <p className="text-sm text-primary-text">Nenhuma avaliação ainda.</p>
+      )}
+
       <div className="flex flex-col divide-y divide-secundary">
-        {reviews.map((review) => {
-          const vote = votes[review.id];
-          const likes = review.likes + (vote === "like" ? 1 : 0);
-          const dislikes = review.dislikes + (vote === "dislike" ? 1 : 0);
+        {avaliacoes.map((review) => {
+          const vote = votes[review.id] ?? null;
+          const likes = review.likes - (review.minhaReacao === "LIKE" ? 1 : 0) + (vote === "LIKE" ? 1 : 0);
+          const dislikes = review.dislikes - (review.minhaReacao === "DISLIKE" ? 1 : 0) + (vote === "DISLIKE" ? 1 : 0);
 
           return (
             <div key={review.id} className="py-4">
               <div className="flex items-center gap-2">
                 <Image
-                  src={review.avatar}
-                  alt={review.username}
+                  src={fallbackImg(null, `user-${review.usuarioId}`)}
+                  alt={review.usuarioUsername}
                   width={36}
                   height={36}
                   className="w-9 h-9 rounded-full object-cover"
                 />
                 <div>
-                  <span className="text-sm font-medium text-gray-800">{review.username}</span>
-                  <StarRating rating={review.rating} />
+                  <span className="text-sm font-medium text-gray-800">@{review.usuarioUsername}</span>
+                  <StarRating rating={review.nota} />
                 </div>
               </div>
 
-              <p className="text-sm text-primary-text mt-2 leading-relaxed">{review.comment}</p>
+              <p className="text-sm text-primary-text mt-2 leading-relaxed">{review.comentario}</p>
 
               <div className="flex items-center gap-4 mt-2 text-xs text-primary-text">
                 <button
-                  onClick={() => handleVote(review.id, "like")}
-                  className={`flex items-center gap-1 transition-colors ${vote === "like" ? "text-primary font-semibold" : "hover:text-primary"}`}
+                  onClick={() => handleVote(review.id, "LIKE")}
+                  className={`flex items-center gap-1 transition-colors ${vote === "LIKE" ? "text-primary font-semibold" : "hover:text-primary"}`}
                 >
                   <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z" />
@@ -63,8 +71,8 @@ export default function ReviewsList({ reviews }: ReviewsListProps) {
                   {likes} gostaram
                 </button>
                 <button
-                  onClick={() => handleVote(review.id, "dislike")}
-                  className={`flex items-center gap-1 transition-colors ${vote === "dislike" ? "text-primary font-semibold" : "hover:text-primary"}`}
+                  onClick={() => handleVote(review.id, "DISLIKE")}
+                  className={`flex items-center gap-1 transition-colors ${vote === "DISLIKE" ? "text-primary font-semibold" : "hover:text-primary"}`}
                 >
                   <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z" />
