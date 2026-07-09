@@ -75,26 +75,43 @@ export default function ReviewModal({ onClose, onSubmit, initialComment = "", in
                 </button>
                 </div>
         
-                {/* Estrelas interativas */}
-                <div className="flex justify-center gap-2 mt-6">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                    key={star}
-                    onMouseEnter={() => setHovered(star)}
-                    onMouseLeave={() => setHovered(0)}
-                    onClick={() => setRating(star)}
-                    >
-                    <svg
-                        viewBox="0 0 24 24"
-                        className={`w-10 h-10 transition-colors ${
-                        star <= (hovered || rating) ? "fill-primary" : "fill-secundary"
-                        }`}
-                    >
-                        <path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.2l7.1-.6z" />
-                    </svg>
-                    </button>
-                ))}
+                {/* Estrelas interativas (suporta meia estrela) */}
+                <div className="flex justify-center gap-2 mt-6" onMouseLeave={() => setHovered(0)}>
+                {[1, 2, 3, 4, 5].map((star) => {
+                    const display = hovered || rating;
+                    const fill = Math.max(0, Math.min(1, display - (star - 1))); // 0, 0.5 ou 1
+                    return (
+                    <div key={star} className="relative w-10 h-10">
+                        {/* Estrela base (vazia) */}
+                        <svg viewBox="0 0 24 24" className="absolute inset-0 w-10 h-10 fill-secundary">
+                            <path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.2l7.1-.6z" />
+                        </svg>
+                        {/* Preenchimento parcial */}
+                        <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
+                            <svg viewBox="0 0 24 24" className="w-10 h-10 fill-primary">
+                                <path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.2l7.1-.6z" />
+                            </svg>
+                        </div>
+                        {/* Zona de clique: metade esquerda = x.5, metade direita = x */}
+                        <button
+                            type="button"
+                            aria-label={`${star - 0.5} estrelas`}
+                            className="absolute inset-y-0 left-0 w-1/2 z-10"
+                            onMouseEnter={() => setHovered(star - 0.5)}
+                            onClick={() => setRating(star - 0.5)}
+                        />
+                        <button
+                            type="button"
+                            aria-label={`${star} estrelas`}
+                            className="absolute inset-y-0 right-0 w-1/2 z-10"
+                            onMouseEnter={() => setHovered(star)}
+                            onClick={() => setRating(star)}
+                        />
+                    </div>
+                    );
+                })}
                 </div>
+                <p className="text-center text-xs text-primary-text mt-2">{rating > 0 ? `${rating} / 5` : "Toque para avaliar"}</p>
         
                 {/* Botão publicar */}
                 <button

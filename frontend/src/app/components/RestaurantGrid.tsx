@@ -18,7 +18,7 @@ export default function RestaurantGrid({ restaurantes }: RestaurantGridProps) {
                     id={r.id}
                     name={r.nome}
                     image={fallbackImg(r.fotoUrl, r.id)}
-                    rating={Math.round(r.notaMedia)}
+                    rating={Math.round(r.notaMedia * 2) / 2}
                 />
             ))}
         </div>
