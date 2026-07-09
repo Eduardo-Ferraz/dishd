@@ -35,12 +35,23 @@ export default function ReviewModal({ onClose, onSubmit, initialComment = "", in
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                 <span className="text-lg font-bold text-gray-800">Avaliação</span>
+                <div className="flex items-center gap-2">
+                <button
+                    onClick={() => setFavorite((v) => !v)}
+                    aria-label={favorite ? "Remover dos favoritos" : "Marcar como favorito"}
+                    className="w-9 h-9 flex items-center justify-center rounded-xl bg-background hover:bg-secundary transition-colors"
+                >
+                    <svg viewBox="0 0 24 24" className={`w-5 h-5 transition-colors ${favorite ? "fill-primary stroke-primary" : "fill-none stroke-primary-text"}`} strokeWidth="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                </button>
                 <button
                     onClick={onClose}
                     className="w-9 h-9 flex items-center justify-center rounded-xl bg-background text-gray-500 hover:text-gray-800"
                 >
                     ✕
                 </button>
+                </div>
                 </div>
         
                 {/* Textarea */}
@@ -53,27 +64,6 @@ export default function ReviewModal({ onClose, onSubmit, initialComment = "", in
                 <p className="text-right text-xs text-primary-text mt-1">
                     {comment.length} / {MAX_CHARS}
                 </p>
-        
-                {/* Anexar foto + Favorito */}
-                <div className="flex items-center gap-3 mt-4">
-                <button className="flex-1 flex items-center gap-2 border border-primary rounded-xl px-3 py-2.5 text-sm text-primary-text hover:bg-secundary transition-colors">
-                    <svg viewBox="0 0 24 24" className="w-5 h-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                    <circle cx="12" cy="13" r="4" />
-                    </svg>
-                    Anexe uma foto
-                </button>
-        
-                <button
-                    onClick={() => setFavorite((v) => !v)}
-                    className="flex flex-col items-center gap-0.5 px-4"
-                >
-                    <svg viewBox="0 0 24 24" className={`w-6 h-6 transition-colors ${favorite ? "fill-primary stroke-primary" : "fill-none stroke-primary-text"}`} strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
-                    <span className="text-xs text-primary-text">Favorito</span>
-                </button>
-                </div>
         
                 {/* Estrelas interativas (suporta meia estrela) */}
                 <div className="flex justify-center gap-2 mt-6" onMouseLeave={() => setHovered(0)}>
