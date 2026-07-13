@@ -45,6 +45,9 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      # Server Actions rodam DENTRO deste container: "localhost" nao acha o backend.
+      # Usa o nome do servico na rede interna do compose.
+      - API_URL=http://backend:8080
     depends_on:
       - backend
 
