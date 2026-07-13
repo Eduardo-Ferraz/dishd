@@ -41,6 +41,11 @@ export default function ReviewsList({ avaliacoes }: ReviewsListProps) {
 
             <p className="text-sm text-primary-text mt-2 leading-relaxed">{review.comentario}</p>
 
+            {review.fotoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={review.fotoUrl} alt="Foto da avaliação" className="mt-2 w-full h-48 object-cover rounded-xl" />
+            )}
+
             <div className="mt-2">
               <ReactionButtons
                 avaliacaoId={review.id}

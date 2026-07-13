@@ -9,6 +9,7 @@ export interface MinhaAvaliacao {
   nota: number;
   comentario: string | null;
   favorito: boolean;
+  fotoUrl: string | null;
 }
 
 interface UserReviewProps {
@@ -23,7 +24,7 @@ export default function UserReview({ restauranteId, avaliacao }: UserReviewProps
 
   const revalidate = `/restaurante/${restauranteId}`;
 
-  function handleSubmit(data: { rating: number; comment: string; favorite: boolean }) {
+  function handleSubmit(data: { rating: number; comment: string; favorite: boolean; photo: string | null }) {
     setError(null);
     startTransition(async () => {
       const input = {
@@ -31,6 +32,7 @@ export default function UserReview({ restauranteId, avaliacao }: UserReviewProps
         nota: data.rating,
         comentario: data.comment,
         favorito: data.favorite,
+        fotoUrl: data.photo,
       };
       const res = avaliacao
         ? await atualizarAvaliacao(avaliacao.id, input, revalidate)
@@ -60,6 +62,10 @@ export default function UserReview({ restauranteId, avaliacao }: UserReviewProps
         <div className="mt-1.5">
           <StarRating rating={avaliacao.nota} />
           <p className="text-sm text-primary-text mt-2 leading-relaxed wrap-break-word">{avaliacao.comentario}</p>
+          {avaliacao.fotoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avaliacao.fotoUrl} alt="Foto da avaliação" className="mt-3 w-full h-48 object-cover rounded-xl" />
+          )}
           <div className="flex gap-3 mt-3">
             <button
               onClick={() => setModalOpen(true)}
@@ -99,6 +105,7 @@ export default function UserReview({ restauranteId, avaliacao }: UserReviewProps
           initialComment={avaliacao?.comentario ?? ""}
           initialRating={avaliacao?.nota ?? 0}
           initialFavorite={avaliacao?.favorito ?? false}
+          initialPhoto={avaliacao?.fotoUrl ?? null}
         />
       )}
     </div>

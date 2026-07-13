@@ -35,7 +35,8 @@ public class Avaliacao {
     @Column(length = 2000)
     private String comentario;
 
-    @Column(name = "foto_url", length = 1000)
+    // Guarda URL curta OU imagem inline em base64 (data URL) — por isso TEXT, sem limite de tamanho.
+    @Column(name = "foto_url", columnDefinition = "text")
     private String fotoUrl;
 
     @Column(nullable = false)

@@ -48,7 +48,7 @@ export default async function RestaurantDetailPage({ params }: PageProps) {
         restauranteId={restaurante.id}
         avaliacao={
           minha
-            ? { id: minha.id, nota: minha.nota, comentario: minha.comentario, favorito: minha.favorito }
+            ? { id: minha.id, nota: minha.nota, comentario: minha.comentario, favorito: minha.favorito, fotoUrl: minha.fotoUrl }
             : undefined
         }
       />

@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  experimental: {
+    // Fotos vão em base64 no corpo da Server Action — folga acima do limite padrão (1MB).
+    serverActions: { bodySizeLimit: "3mb" },
+  },
   images: {
     remotePatterns: [
       {
