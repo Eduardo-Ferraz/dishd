@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans, Work_Sans } from "next/font/google";
 import "./globals.css";
+import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -20,6 +21,20 @@ const workSans = Work_Sans({
 export const metadata: Metadata = {
   title: "Dishd",
   description: "Projeto Integrado - Dishd",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Dishd",
+  },
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#D2691E",
 };
 
 export default function RootLayout({
@@ -34,6 +49,7 @@ export default function RootLayout({
     >
       {/* Definimos a 'font-playfair' como fonte padrão do corpo inteiro do site */}
       <body className="font-playfair antialiased bg-background">
+        <ServiceWorkerRegister />
         {children}
       </body>
     </html>

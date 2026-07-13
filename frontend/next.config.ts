@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Raiz do workspace = esta pasta (evita warning por múltiplos lockfiles no monorepo).
+  turbopack: {
+    root: __dirname,
+  },
   images: {
     remotePatterns: [
       {

@@ -9,8 +9,8 @@ services:
       POSTGRES_DB: dishd
       POSTGRES_USER: dishd
       POSTGRES_PASSWORD: dishd
-    ports:
-      - "5432:5432"
+    # porta 5432 nao publicada: evita conflito com Postgres local do host.
+    # backend acessa via rede interna do compose (host "db").
     volumes:
       - dishd_pgdata:/var/lib/postgresql/data
     healthcheck:
